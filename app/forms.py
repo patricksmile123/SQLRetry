@@ -41,3 +41,5 @@ class LoanForm(FlaskForm):
 
 class ReturnForm(FlaskForm):
     student_id = StringField('Student ID', validators=[DataRequired()])
+    device_id = StringField('Device ID', validators=[DataRequired()])
+    submit = SubmitField('Return Device')
