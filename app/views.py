@@ -3,8 +3,8 @@ import traceback
 from flask import render_template, redirect, url_for, flash
 from app import app, db
 from datetime import datetime
-from app.forms import LoginForm, RegistrationForm, AddStudentForm, LoanForm
-from app.models import Student, Loan
+from app.forms import LoginForm, RegistrationForm, AddStudentForm, LoanForm, ReturnForm
+from app.models import Student, Loan, Return
 
 
 @app.route('/')
@@ -75,3 +75,24 @@ def borrow_device():
             if Loan.query.filter_by(student_id=form.student_id.data).first():
                 form.student_id.errors.append('This student already has a device taken out')
     return render_template('loan.html', title='Borrow Device', form=form)
+
+
+@app.route('/return_device', methods=['GET', 'POST'])
+def return_device():
+    form = ReturnForm()
+    if form.validate_on_submit():
+        user = Loan.query.filter_by(student_id=form.student_id.data).first()
+        new_return = Return(student_id=form.student_id.data, device_id=form.device_id.data, loan_id=user.loan_id)
+        db.session.add(new_return)
+        try:
+            student_id_to_delete = form.student_id.data
+            loans_to_delete = Loan.query.filter(Loan.student_id == student_id_to_delete)
+            for loan in loans_to_delete:
+                db.session.delete(loan)
+            db.session.commit()
+            flash(f'Return Completed', 'success')
+            return redirect(url_for('index'))
+        except Exception:
+            print(traceback.format_exc())
+            db.session.rollback()
+    return render_template('returns.html', title='Return Device', form=form)

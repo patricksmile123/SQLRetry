@@ -23,7 +23,7 @@ class Loan(db.Model):
     student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'), nullable=False)
 
     def __repr__(self):
-        return f"loan('{self.device_id}', '{self.borrowdatetime}' , '{self.returndatetime}', '{self.student}')"
+        return f"loan('{self.device_id}', '{self.borrowdatetime}' , '{self.returndatetime}', '{self.student_id}')"
 
 
 class Return(db.Model):
@@ -32,3 +32,6 @@ class Return(db.Model):
     device_id = db.Column(db.Integer, nullable=False)
     student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'), nullable=False)
     loan_id = db.Column(db.Integer, db.ForeignKey('loans.loan_id'), nullable=False)
+
+    def __repr__(self):
+        return f"returns('{self.return_id}', '{self.device_id}' , '{self.student_id}', '{self.loan_id}')"
